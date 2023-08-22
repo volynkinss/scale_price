@@ -1,70 +1,56 @@
 from aiogram import Bot, types
 from aiogram.dispatcher import Dispatcher
 from aiogram.utils import executor
+from redoubt_agent import RedoubtEventsStream
 from for_bot import bot_token, api_redebout
-from requests import get, post
-import pandas as pd
+from loguru import logger
 
 
 bot = Bot(token=bot_token)
 dp = Dispatcher(bot)
 
 
+class JettonTransfersBot:
+    def __init__(self, api_key=None):
+        self.api_key = api_key
+        self.stream = RedoubtEventsStream(api_key)
+
+    async def handler(self, obj):
+        res = await self.stream.execute(
+            """
+            query jetton {
+                redoubt_jetton_master(where: {address: {_eq:"%s"}}) {
+                    address
+                    symbol
+                    decimals
+                    admin_address
+                }
+            }
+        """
+            % obj["data"]["master"]
+        )
+        print(obj)
+        print(res)
+        if len(res["redoubt_jetton_master"]) == 0:
+            logger.info("Jetton master info not found")
+        jetton = res["redoubt_jetton_master"][0]
+        decimals = jetton.get("decimals", 9)
+        if not decimals:
+            decimals = 9
+        logger.info(
+            f"{obj['data']['source_owner']} => {obj['data']['destination_owner']} {int(obj['data']['amount']) / pow(10, decimals)} {jetton['symbol']}"
+        )
+
+    async def start_check(self):
+        logger.info("Running jetton transfer bot")
+        await self.stream.subscribe(self.handler, scope="Jetton", event_type="Transfer")
+
+
 @dp.message_handler(commands=["start"])
 async def start(message: types.Message):
     await message.reply("Hello everybody")
-    print(execute_query("1258228"))
-
-
-API_KEY = api_redebout
-HEADER = {"x-tonalytica-api-key": API_KEY}
-
-BASE_URL = "https://tonalytica.redoubt.online/api/v1/"
-
-
-def make_api_url(module, action, ID):
-    url = BASE_URL + module + "/" + ID + "/" + action
-    return url
-
-
-def execute_query(query_id):
-    """
-    Takes in the query ID.tpyt
-    Calls the API to execute the query.
-    Returns the execution ID of the instance which is executing the query.
-    """
-
-    url = make_api_url("query", "execute", query_id)
-    print(url)
-    response = post(url, headers=HEADER)
-    print(response)
-    execution_id = response.json()["execution_id"]
-    return execution_id
-
-
-def get_query_status(execution_id):
-    """
-    Takes in an execution ID.
-    Fetches the status of query execution using the API
-    Returns the status response object
-    """
-    url = make_api_url("execution", "status", execution_id)
-    response = get(url, headers=HEADER)
-    return response
-
-
-def execute_query_with_params(query_id, param_dict):
-    """
-    Takes in the query ID. And a dictionary containing parameter values.
-    Calls the API to execute the query.
-    Returns the execution ID of the instance which is executing the query.
-    """
-
-    url = make_api_url("query", "execute", query_id)
-    response = post(url, headers=HEADER, json={"query_parameters": param_dict})
-    execution_id = response.json()["execution_id"]
-
-    return execution_id
+    worker = JettonTransfersBot(api_key=api_redebout)
+    await worker.start_check()
 
 
 if __name__ == "__main__":
