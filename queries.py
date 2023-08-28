@@ -1,4 +1,4 @@
-class Queryes:
+class queries:
     def jetton_name_query(self, address):
         query = (
             """
