@@ -3,7 +3,7 @@
 # 3. output to console average value of every token by src/dst
 
 import asyncio
-from for_bot import api_redebout
+from for_bot import api_redoubt
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
 from queries import queries
@@ -53,7 +53,7 @@ by user {swap_operation['swap_user']}:
 
 
 async def start():
-    worker = GraphqlQuery(api_key=api_redebout)
+    worker = GraphqlQuery(api_key=api_redoubt)
     await worker.start_check()
 
 
