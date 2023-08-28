@@ -1,5 +1,6 @@
 class queries:
-    def jetton_name_query(self, address):
+    @staticmethod
+    def jetton_name_query(address):
         query = (
             """
                 query JettonName {
@@ -12,7 +13,8 @@ class queries:
         )
         return query
 
-    def dex_swaps_query(self):
+    @staticmethod
+    def dex_swaps_query():
         query = """
                     query GetDexSwaps {
                             redoubt_dex_swaps {
