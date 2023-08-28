@@ -1,21 +1,13 @@
 class queries:
-    @staticmethod
-    def jetton_name_query(address):
-        query = (
-            """
+    jetton_name_query = """
                 query JettonName {
                         redoubt_jetton_master (where: {address: {_eq:"%s"}}) {
                             name
                         }
                     }
                 """
-            % address
-        )
-        return query
 
-    @staticmethod
-    def dex_swaps_query():
-        query = """
+    dex_swaps_query = """
                     query GetDexSwaps {
                             redoubt_dex_swaps {
                                 msg_id
@@ -29,4 +21,3 @@ class queries:
                             }
                         }
                     """
-        return query
