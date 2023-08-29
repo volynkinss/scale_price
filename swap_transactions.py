@@ -17,7 +17,7 @@ class GraphqlQuery:
 
     async def get_jetton_name(self, address):
         jetton_name_query = await self.stream.execute(
-            queries.jetton_name_query % address
+            queries.JETTON_NAME_QUERY % address
         )
         if jetton_name_query["redoubt_jetton_master"] == []:
             name = "UNKWN Coin"
@@ -26,7 +26,7 @@ class GraphqlQuery:
         return name
 
     async def get_swap_transactions(self):
-        swaps_info = await self.stream.execute(queries.dex_swaps_query)
+        swaps_info = await self.stream.execute(queries.DEX_SWAPS_QUERY)
         swaps_info = swaps_info["redoubt_dex_swaps"]
         if len(swaps_info) == 0:
             logger.info("dex swaps not found")

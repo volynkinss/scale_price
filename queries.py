@@ -1,5 +1,5 @@
 class queries:
-    jetton_name_query = """
+    JETTON_NAME_QUERY = """
                 query JettonName {
                         redoubt_jetton_master (where: {address: {_eq:"%s"}}) {
                             name
@@ -7,7 +7,7 @@ class queries:
                     }
                 """
 
-    dex_swaps_query = """
+    DEX_SWAPS_QUERY = """
                     query GetDexSwaps {
                             redoubt_dex_swaps {
                                 msg_id
