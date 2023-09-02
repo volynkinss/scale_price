@@ -1,12 +1,13 @@
-# 1. console output of dex_swaps result by graphql query
-# 2. try to get all swaps by last minute
-# 3. output to console average value of every token by src/dst
+# 1. console output of dex_swaps result by graphql query - done
+# 2. try to get all swaps by last minute - impossible
+# 3. output to console average value of every token by src/dst - done
 
 import asyncio
 from for_bot import api_redoubt
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
-from queries import queries
+from resourses.queries import queries
+from resourses.swap_operation import OperationDetails
 from decimal import Decimal
 
 
@@ -32,18 +33,14 @@ class GraphqlQuery:
             logger.info("dex swaps not found")
             return
         for index in range(len(swaps_info)):
-            swap_operation = swaps_info[index]
-            src_token_name = await self.get_jetton_name(
-                swap_operation["swap_src_token"]
+            swap_operation = OperationDetails(swaps_info[index])
+            src_token_name = await self.get_jetton_name(swap_operation.src_token)
+            dst_token_name = await self.get_jetton_name(swap_operation.dst_token)
+            total_rate = Decimal(swap_operation.src_amount) / Decimal(
+                swap_operation.dst_amount
             )
-            dst_token_name = await self.get_jetton_name(
-                swap_operation["swap_dst_token"]
-            )
-            total_rate = Decimal(swap_operation["swap_src_amount"]) / Decimal(
-                swap_operation["swap_dst_amount"]
-            )
-            swap_info_msg = f"""\nSwap id № {swap_operation['msg_id']} at {swap_operation['swap_time']} on {swap_operation['platform']} platform
-by user {swap_operation['swap_user']}:
+            swap_info_msg = f"""\nSwap id № {swap_operation.msg_id} at {swap_operation.formatted_time()} on {swap_operation.platform} platform
+by user {swap_operation.user}:
 {src_token_name} => {dst_token_name} at a rate of {total_rate}"""
             logger.info(swap_info_msg)
 
