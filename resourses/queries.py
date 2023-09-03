@@ -21,3 +21,13 @@ class queries:
                             }
                         }
                     """
+    JETTON_MASTER_QUERY = """
+            query jetton {
+                redoubt_jetton_master(where: {address: {_eq:"%s"}}) {
+                    address
+                    symbol
+                    decimals
+                    admin_address
+                }
+            }
+        """

@@ -2,8 +2,6 @@
 # 2. try to get all swaps by last minute - impossible
 # 3. output to console average value of every token by src/dst - done
 
-import asyncio
-from for_bot import api_redoubt
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
 from resourses.queries import queries
@@ -15,6 +13,20 @@ from decimal import Decimal
 class GraphqlQuery:
     def __init__(self, api_key=None):
         self.stream = RedoubtEventsStream(api_key)
+
+    async def get_jetton_transfers(self, obj):
+        res = await self.stream.execute(
+            queries.JETTON_MASTER_QUERY % obj["data"]["master"]
+        )
+        if len(res["redoubt_jetton_master"]) == 0:
+            logger.info("Jetton master info not found")
+        jetton = res["redoubt_jetton_master"][0]
+        decimals = jetton.get("decimals", 9)
+        if not decimals:
+            decimals = 9
+        logger.info(
+            f"{obj['data']['source_owner']} => {obj['data']['destination_owner']} {int(obj['data']['amount']) / pow(10, decimals)} {jetton['symbol']}"
+        )
 
     async def get_jetton_name(self, address):
         jetton_name_query = await self.stream.execute(
@@ -40,7 +52,7 @@ class GraphqlQuery:
             total_rate = Decimal(swap_operation.src_amount) / Decimal(
                 swap_operation.dst_amount
             )
-            result = Localization.swap_info_msg.format(
+            swap_transaction = Localization.swap_info_msg.format(
                 swap_operation.msg_id,
                 swap_operation.formatted_time(),
                 swap_operation.platform,
@@ -49,18 +61,14 @@ class GraphqlQuery:
                 dst_token_name,
                 total_rate,
             )
-            logger.info(result)
+            logger.info(swap_transaction)
 
-    async def start_check(self):
+    async def start_jetton_transfer_checker(self):
+        logger.info("Running jetton transfer checker")
+        await self.stream.subscribe(
+            self.get_jetton_transfers, scope="Jetton", event_type="Transfer"
+        )
+
+    async def start_swap_checker(self):
         logger.info("Running dex swaps checker")
         await self.get_swap_transactions()
-
-
-async def start():
-    worker = GraphqlQuery(api_key=api_redoubt)
-    await worker.start_check()
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start())
