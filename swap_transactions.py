@@ -8,22 +8,23 @@ from loguru import logger
 from redoubt_agent import RedoubtEventsStream
 from resourses.queries import queries
 from resourses.swap_operation import OperationDetails
+from resourses.Localization import Localization
 from decimal import Decimal
 
 
 class GraphqlQuery:
     def __init__(self, api_key=None):
-        self.api_key = api_key
         self.stream = RedoubtEventsStream(api_key)
 
     async def get_jetton_name(self, address):
         jetton_name_query = await self.stream.execute(
             queries.JETTON_NAME_QUERY % address
         )
-        if jetton_name_query["redoubt_jetton_master"] == []:
+        jetton_name_query_result = jetton_name_query["redoubt_jetton_master"]
+        if jetton_name_query_result == []:
             name = "UNKWN Coin"
         else:
-            name = jetton_name_query["redoubt_jetton_master"][0]["name"]
+            name = jetton_name_query_result[0]["name"]
         return name
 
     async def get_swap_transactions(self):
@@ -39,10 +40,16 @@ class GraphqlQuery:
             total_rate = Decimal(swap_operation.src_amount) / Decimal(
                 swap_operation.dst_amount
             )
-            swap_info_msg = f"""\nSwap id № {swap_operation.msg_id} at {swap_operation.formatted_time()} on {swap_operation.platform} platform
-by user {swap_operation.user}:
-{src_token_name} => {dst_token_name} at a rate of {total_rate}"""
-            logger.info(swap_info_msg)
+            result = Localization.swap_info_msg.format(
+                swap_operation.msg_id,
+                swap_operation.formatted_time(),
+                swap_operation.platform,
+                swap_operation.user,
+                src_token_name,
+                dst_token_name,
+                total_rate,
+            )
+            logger.info(result)
 
     async def start_check(self):
         logger.info("Running dex swaps checker")
