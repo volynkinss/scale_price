@@ -13,6 +13,7 @@ class OperationDetails:
         self.dst_amount = operation["swap_dst_amount"]
 
     def formatted_time(self):
-        time_obj = datetime.datetime.strptime(self.time, "%Y-%m-%dT%H:%M:%S%z")
-        formatted_time = time_obj.strftime("%d.%m.%Y %H:%M:%S")
+        formatted_time = datetime.datetime.strptime(
+            self.time, "%Y-%m-%dT%H:%M:%S%z"
+        ).strftime("%d.%m.%Y %H:%M:%S")
         return formatted_time
