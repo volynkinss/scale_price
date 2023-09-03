@@ -1,6 +1,6 @@
 import asyncio
 from for_bot import api_redoubt
-from swap_transactions import GraphqlQuery
+from GraphqlQueries import GraphqlQuery
 
 
 async def start():
