@@ -31,3 +31,7 @@ class queries:
                 }
             }
         """
+
+
+SCOPE = "Jetton"
+EVENT_TYPE = "Transfer"

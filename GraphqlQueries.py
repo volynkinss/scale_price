@@ -4,7 +4,7 @@
 
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
-from resourses.queries import queries
+from resourses.queries import queries, SCOPE, EVENT_TYPE
 from resourses.swap_operation import OperationDetails
 from resourses.Localization import Localization
 from decimal import Decimal
@@ -67,7 +67,7 @@ class GraphqlQuery:
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")
         await self.stream.subscribe(
-            self.get_jetton_transfers, scope="Jetton", event_type="Transfer"
+            self.get_jetton_transfers, scope=SCOPE, event_type=EVENT_TYPE
         )
 
     async def start_swap_checker(self):
