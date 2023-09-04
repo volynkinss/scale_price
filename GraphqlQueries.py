@@ -14,18 +14,18 @@ class GraphqlQuery:
     def __init__(self, api_key=None):
         self.stream = RedoubtEventsStream(api_key)
 
-    async def get_jetton_transfers(self, obj):
-        res = await self.stream.execute(
-            queries.JETTON_MASTER_QUERY % obj["data"]["master"]
+    async def get_jetton_transfers(self, transfer_info):
+        jetton_master_query_result = await self.stream.execute(
+            queries.JETTON_MASTER_QUERY % transfer_info["data"]["master"]
         )
-        if len(res["redoubt_jetton_master"]) == 0:
+        if len(jetton_master_query_result["redoubt_jetton_master"]) == 0:
             logger.info("Jetton master info not found")
-        jetton = res["redoubt_jetton_master"][0]
+        jetton = jetton_master_query_result["redoubt_jetton_master"][0]
         decimals = jetton.get("decimals", 9)
         if not decimals:
             decimals = 9
         logger.info(
-            f"{obj['data']['source_owner']} => {obj['data']['destination_owner']} {int(obj['data']['amount']) / pow(10, decimals)} {jetton['symbol']}"
+            f"{transfer_info['data']['source_owner']} => {transfer_info['data']['destination_owner']} {int(transfer_info['data']['amount']) / pow(10, decimals)} {jetton['symbol']}"
         )
 
     async def get_jetton_name(self, address):
@@ -41,8 +41,8 @@ class GraphqlQuery:
         return name
 
     async def get_swap_transactions(self):
-        dex_swaps_query = await self.stream.execute(queries.DEX_SWAPS_QUERY)
-        swaps_info = dex_swaps_query["redoubt_dex_swaps"]
+        dex_swaps_query_result = await self.stream.execute(queries.DEX_SWAPS_QUERY)
+        swaps_info = dex_swaps_query_result["redoubt_dex_swaps"]
         if len(swaps_info) == 0:
             logger.info("dex swaps not found")
             return
