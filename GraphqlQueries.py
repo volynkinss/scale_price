@@ -33,10 +33,11 @@ class GraphqlQuery:
             queries.JETTON_NAME_QUERY % address
         )
         jetton_name_query_result = jetton_name_query["redoubt_jetton_master"]
-        if jetton_name_query_result == []:
-            name = "UNKWN Coin"
-        else:
-            name = jetton_name_query_result[0]["name"]
+        name = (
+            "UNKWN Coin"
+            if jetton_name_query_result == []
+            else jetton_name_query_result[0]["name"]
+        )
         return name
 
     async def get_swap_transactions(self):
