@@ -54,7 +54,7 @@ class GraphqlQuery:
             )
             swap_transaction = Localization.swap_info_msg.format(
                 swap_operation.msg_id,
-                swap_operation.formatted_time(),
+                swap_operation.time,
                 swap_operation.platform,
                 swap_operation.user,
                 src_token_name,
