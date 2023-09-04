@@ -7,6 +7,7 @@ from redoubt_agent import RedoubtEventsStream
 from resourses.queries import queries, SCOPE, EVENT_TYPE
 from resourses.swap_operation import OperationDetails
 from resourses.Localization import Localization
+from resourses.jetton_transfers import JettonTranfer
 from decimal import Decimal
 
 
@@ -14,18 +15,27 @@ class GraphqlQuery:
     def __init__(self, api_key=None):
         self.stream = RedoubtEventsStream(api_key)
 
-    async def get_jetton_transfers(self, transfer_info):
+    async def get_jetton_transfers(self, transfers_info):
+        transfer = JettonTranfer(transfers_info)
         jetton_master_query_result = await self.stream.execute(
-            queries.JETTON_MASTER_QUERY % transfer_info["data"]["master"]
+            queries.JETTON_MASTER_QUERY % transfer.master
         )
-        if len(jetton_master_query_result["redoubt_jetton_master"]) == 0:
+        redoubt_jetton_master = jetton_master_query_result["redoubt_jetton_master"]
+        if len(redoubt_jetton_master) == 0:
             logger.info("Jetton master info not found")
-        jetton = jetton_master_query_result["redoubt_jetton_master"][0]
+        jetton = redoubt_jetton_master[0]
+        symbol = jetton["symbol"]
         decimals = jetton.get("decimals", 9)
         if not decimals:
             decimals = 9
+        readble_transfer_amount = transfer.amount / pow(10, decimals)
         logger.info(
-            f"{transfer_info['data']['source_owner']} => {transfer_info['data']['destination_owner']} {int(transfer_info['data']['amount']) / pow(10, decimals)} {jetton['symbol']}"
+            Localization.jetton_transfer_msg.format(
+                transfer.source_owner,
+                transfer.destination_owner,
+                readble_transfer_amount,
+                symbol,
+            )
         )
 
     async def get_jetton_name(self, address):
