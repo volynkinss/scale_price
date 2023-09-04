@@ -41,8 +41,8 @@ class GraphqlQuery:
         return name
 
     async def get_swap_transactions(self):
-        swaps_info = await self.stream.execute(queries.DEX_SWAPS_QUERY)
-        swaps_info = swaps_info["redoubt_dex_swaps"]
+        dex_swaps_query = await self.stream.execute(queries.DEX_SWAPS_QUERY)
+        swaps_info = dex_swaps_query["redoubt_dex_swaps"]
         if len(swaps_info) == 0:
             logger.info("dex swaps not found")
             return
