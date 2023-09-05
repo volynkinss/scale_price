@@ -78,9 +78,10 @@ class GraphqlQuery:
         swap = DexSwapDetails(data)
         name_token_out = await self.get_jetton_name(swap.token_out)
         name_token_in = await self.get_jetton_name(swap.token_in)
-        logger.info(
-            f"{swap.amount_out} {name_token_out} => {swap.amount_in} {name_token_in} by user {swap.user}"
+        swap_monitoring = Localization.swap_monitoring_msg.format(
+            swap.amount_out, name_token_out, swap.amount_in, name_token_in, swap.user
         )
+        logger.info(swap_monitoring)
 
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")
