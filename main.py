@@ -5,8 +5,7 @@ from GraphqlQueries import GraphqlQuery
 
 async def start():
     worker = GraphqlQuery(api_key=api_redoubt)
-    await worker.start_swap_checker()
-    await worker.start_jetton_transfer_checker()
+    await worker.start_swap_monitoring()
 
 
 if __name__ == "__main__":

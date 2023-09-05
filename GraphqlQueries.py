@@ -5,7 +5,7 @@
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
 from resourses.queries import queries, SCOPE, EVENT_TYPE
-from resourses.swap_operation import OperationDetails
+from resourses.swap_operation import OperationDetails, DexSwapDetails
 from resourses.Localization import Localization
 from resourses.jetton_transfers import JettonTranfer
 from decimal import Decimal
@@ -74,6 +74,14 @@ class GraphqlQuery:
             )
             logger.info(swap_transaction)
 
+    async def swap_monitoring(self, data):
+        swap = DexSwapDetails(data)
+        name_token_out = await self.get_jetton_name(swap.token_out)
+        name_token_in = await self.get_jetton_name(swap.token_in)
+        logger.info(
+            f"{swap.amount_out} {name_token_out} => {swap.amount_in} {name_token_in} by user {swap.user}"
+        )
+
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")
         await self.stream.subscribe(
@@ -83,3 +91,9 @@ class GraphqlQuery:
     async def start_swap_checker(self):
         logger.info("Running dex swaps checker")
         await self.get_swap_transactions()
+
+    async def start_swap_monitoring(self):
+        logger.info("Running swap monitoring")
+        await self.stream.subscribe(
+            self.swap_monitoring, scope="DEX", event_type="Swap"
+        )
