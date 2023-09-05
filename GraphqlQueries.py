@@ -9,6 +9,7 @@ from resourses.swap_operation import OperationDetails, DexSwapDetails
 from resourses.Localization import Localization
 from resourses.jetton_transfers import JettonTranfer
 from decimal import Decimal
+from tg_bot.actions import show_swap_monitoring
 
 
 class GraphqlQuery:
@@ -82,6 +83,7 @@ class GraphqlQuery:
             swap.amount_out, name_token_out, swap.amount_in, name_token_in, swap.user
         )
         logger.info(swap_monitoring)
+        await show_swap_monitoring()
 
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")
