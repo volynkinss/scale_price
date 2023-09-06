@@ -80,8 +80,14 @@ class GraphqlQuery:
         swap = DexSwapDetails(data)
         name_token_out = await self.get_jetton_name(swap.token_out)
         name_token_in = await self.get_jetton_name(swap.token_in)
+        total_rate = swap.amount_out / swap.amount_in
         swap_monitoring = Localization.swap_monitoring_msg.format(
-            swap.amount_out, name_token_out, swap.amount_in, name_token_in, swap.user
+            swap.amount_out,
+            name_token_out,
+            swap.amount_in,
+            name_token_in,
+            total_rate,
+            swap.user,
         )
         logger.info(swap_monitoring)
         await bot.send_message(chat_id=self.chat_id, text=swap_monitoring)
