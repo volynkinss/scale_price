@@ -9,12 +9,13 @@ from resourses.swap_operation import OperationDetails, DexSwapDetails
 from resourses.Localization import Localization
 from resourses.jetton_transfers import JettonTranfer
 from decimal import Decimal
-from tg_bot.actions import show_swap_monitoring
+from bot_setup import bot
 
 
 class GraphqlQuery:
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, chat_id=None):
         self.stream = RedoubtEventsStream(api_key)
+        self.chat_id = chat_id
 
     async def get_jetton_transfers(self, transfers_info):
         transfer = JettonTranfer(transfers_info)
@@ -83,7 +84,7 @@ class GraphqlQuery:
             swap.amount_out, name_token_out, swap.amount_in, name_token_in, swap.user
         )
         logger.info(swap_monitoring)
-        await show_swap_monitoring()
+        await bot.send_message(chat_id=self.chat_id, text=swap_monitoring)
 
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")
