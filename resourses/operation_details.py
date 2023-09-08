@@ -23,3 +23,11 @@ class DexSwapDetails:
         self.amount_in = Decimal(data["data"]["amount_in"]) / pow(10, 9)
         self.amount_out = Decimal(data["data"]["amount_out"]) / pow(10, 9)
         self.user = data["data"]["swap_user"]
+
+
+class JettonTranferDetails:
+    def __init__(self, transfers_info):
+        self.master = transfers_info["data"]["master"]
+        self.source_owner = transfers_info["data"]["source_owner"]
+        self.destination_owner = transfers_info["data"]["destination_owner"]
+        self.amount = int(transfers_info["data"]["amount"])

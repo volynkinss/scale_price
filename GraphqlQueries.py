@@ -5,9 +5,9 @@
 from loguru import logger
 from redoubt_agent import RedoubtEventsStream
 from resourses.queries import queries, SCOPE, EVENT_TYPE
-from resourses.swap_operation import OperationDetails, DexSwapDetails
+from resourses.operation_details import OperationDetails, DexSwapDetails
 from resourses.Localization import Localization
-from resourses.jetton_transfers import JettonTranfer
+from resourses.operation_details import JettonTranferDetails
 from decimal import Decimal
 from bot_setup import bot
 
@@ -18,7 +18,7 @@ class GraphqlQuery:
         self.chat_id = chat_id
 
     async def get_jetton_transfers(self, transfers_info):
-        transfer = JettonTranfer(transfers_info)
+        transfer = JettonTranferDetails(transfers_info)
         jetton_master_query_result = await self.stream.execute(
             queries.JETTON_MASTER_QUERY % transfer.master
         )
