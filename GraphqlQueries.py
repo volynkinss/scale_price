@@ -10,6 +10,7 @@ from resourses.Localization import Localization
 from resourses.operation_details import JettonTranferDetails
 from decimal import Decimal
 from bot_setup import bot
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 class GraphqlQuery:
@@ -82,15 +83,22 @@ class GraphqlQuery:
         name_token_in = await self.get_jetton_name(swap.token_in)
         total_rate = swap.amount_out / swap.amount_in
         swap_monitoring = Localization.swap_monitoring_msg.format(
+            swap.user,
             swap.amount_out,
             name_token_out,
             swap.amount_in,
             name_token_in,
             total_rate,
-            swap.user,
         )
         logger.info(swap_monitoring)
-        await bot.send_message(chat_id=self.chat_id, text=swap_monitoring)
+        key = InlineKeyboardMarkup(resize_keyboard=True)
+        button = InlineKeyboardButton(
+            text="User's link 🔗", url=f"tonviewer.com/{swap.user}"
+        )
+        key.add(button)
+        await bot.send_message(
+            chat_id=self.chat_id, text=swap_monitoring, reply_markup=key
+        )
 
     async def start_jetton_transfer_checker(self):
         logger.info("Running jetton transfer checker")

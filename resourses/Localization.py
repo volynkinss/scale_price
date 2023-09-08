@@ -3,4 +3,6 @@ class Localization:
         """\nSwap id № {} at {} on {} platform\nby user {}:\n{} => {} at a rate of {}"""
     )
     jetton_transfer_msg = "{} => {} {} {}"
-    swap_monitoring_msg = "{:.3f} {} => {:.3f} {}\ntotal rate is {:.3f}\nby user: {}"
+    swap_monitoring_msg = (
+        "🔄Swap by user: {}\n🟥 -{:.3f} {} \n🟩 +{:.3f} {}\n♻️total rate is {:.3f}"
+    )
